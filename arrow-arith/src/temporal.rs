@@ -93,8 +93,10 @@ where
     T: ChronoDateExt + Datelike + Timelike,
 {
     match part {
-        DatePart::Quarter => |d| d.quarter() as i32,
         DatePart::Year => |d| d.year(),
+        // Datelike and ChronoDataExt does export .quarter() function
+        // for this case we needs to be clarified which version are we using
+        DatePart::Quarter => |d| Datelike::quarter(&d) as i32,
         DatePart::YearISO => |d| d.iso_week().year(),
         DatePart::Month => |d| d.month() as i32,
         DatePart::Week | DatePart::WeekISO => |d| d.iso_week().week() as i32,
