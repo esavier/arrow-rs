@@ -852,7 +852,7 @@ mod tests {
 
     #[test]
     fn test_quarter_timestamp_nanosecond() {
-        // same but nanosecond precision (ms * 1_000_000)
+        // same as `test_quarter_timestamp_microsecond` but nanosecond precision (ms * 1_000_000)
         // 1775001600000000000 -> 2026-04-01 (Q2)
         // 1790812800000000000 -> 2026-10-01 (Q4)
         let a: TimestampNanosecondArray =
