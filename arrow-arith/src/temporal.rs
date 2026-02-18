@@ -794,6 +794,77 @@ mod tests {
     }
 
     #[test]
+    fn test_all_quarters_date64() {
+        // verify all 4 quarters return 1-4 (not 0-indexed!)
+        // 1767225600000 -> 2026-01-01 (Q1)
+        // 1775001600000 -> 2026-04-01 (Q2, +90 days: jan31+feb28+mar31)
+        // 1782864000000 -> 2026-07-01 (Q3, +181 days)
+        // 1790812800000 -> 2026-10-01 (Q4, +273 days)
+        let a: PrimitiveArray<Date64Type> = vec![
+            Some(1767225600000),
+            Some(1775001600000),
+            Some(1782864000000),
+            Some(1790812800000),
+            None,
+        ]
+        .into();
+
+        let b = date_part_primitive(&a, DatePart::Quarter).unwrap();
+        assert_eq!(1, b.value(0)); // jan -> q1
+        assert_eq!(2, b.value(1)); // apr -> q2
+        assert_eq!(3, b.value(2)); // jul -> q3
+        assert_eq!(4, b.value(3)); // oct -> q4
+        assert!(!b.is_valid(4));
+    }
+
+    #[test]
+    fn test_all_quarters_date32() {
+        // verify all 4 quarters for Date32 (days since epoch)
+        // 20454 -> 2026-01-01 (Q1)
+        // 20544 -> 2026-04-01 (Q2, +90 days)
+        // 20635 -> 2026-07-01 (Q3, +181 days)
+        // 20727 -> 2026-10-01 (Q4, +273 days)
+        let a: PrimitiveArray<Date32Type> =
+            vec![Some(20454), Some(20544), Some(20635), Some(20727), None].into();
+
+        let b = date_part_primitive(&a, DatePart::Quarter).unwrap();
+        assert_eq!(1, b.value(0));
+        assert_eq!(2, b.value(1));
+        assert_eq!(3, b.value(2));
+        assert_eq!(4, b.value(3));
+        assert!(!b.is_valid(4));
+    }
+
+    #[test]
+    fn test_quarter_timestamp_microsecond() {
+        // no existing test for microsecond quarter, so lets add it
+        // timestamps are in microseconds (ms * 1000)
+        // 1767225600000000 -> 2026-01-01 (Q1)
+        // 1782864000000000 -> 2026-07-01 (Q3)
+        let a: TimestampMicrosecondArray =
+            vec![Some(1767225600000000), None, Some(1782864000000000)].into();
+
+        let b = date_part_primitive(&a, DatePart::Quarter).unwrap();
+        assert_eq!(1, b.value(0));
+        assert!(!b.is_valid(1));
+        assert_eq!(3, b.value(2));
+    }
+
+    #[test]
+    fn test_quarter_timestamp_nanosecond() {
+        // same but nanosecond precision (ms * 1_000_000)
+        // 1775001600000000000 -> 2026-04-01 (Q2)
+        // 1790812800000000000 -> 2026-10-01 (Q4)
+        let a: TimestampNanosecondArray =
+            vec![Some(1775001600000000000), None, Some(1790812800000000000)].into();
+
+        let b = date_part_primitive(&a, DatePart::Quarter).unwrap();
+        assert_eq!(2, b.value(0));
+        assert!(!b.is_valid(1));
+        assert_eq!(4, b.value(2));
+    }
+
+    #[test]
     fn test_temporal_array_date64_month() {
         //1514764800000 -> 2018-01-01
         //1550636625000 -> 2019-02-20
