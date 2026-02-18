@@ -837,7 +837,6 @@ mod tests {
 
     #[test]
     fn test_quarter_timestamp_microsecond() {
-        // no existing test for microsecond quarter, so lets add it
         // timestamps are in microseconds (ms * 1000)
         // 1767225600000000 -> 2026-01-01 (Q1)
         // 1782864000000000 -> 2026-07-01 (Q3)
